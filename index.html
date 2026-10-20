@@ -1,0 +1,1650 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FeSA - Fast e-Services Access</title>
+    <style>
+        :root {
+            --primary: #004d40;
+            --primary-dark: #00332c;
+            --accent: #00796b;
+            --light-bg: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #2c3e50;
+            --border-color: #e2e8f0;
+            --admin-color: #c0392b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Header Fluide & Responsive */
+        header {
+            background-color: var(--primary);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        header nav ul {
+            list-style: none;
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        header nav ul li a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 0.95rem;
+        }
+
+        header nav ul li a:hover {
+            color: #80cbc4;
+        }
+
+        .btn-connexion-nav {
+            background-color: var(--accent);
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-admin-nav {
+            background-color: var(--admin-color) !important;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+        }
+
+        /* Conteneur Principal Vaste et Fluide */
+        main {
+            flex: 1;
+            width: 100%;
+            max-width: 1400px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1,
+        h2 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1.5rem;
+            color: #555;
+        }
+
+        /* Grilles et Formulaires Modernes & Responsive */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.2rem;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            background: var(--card-bg);
+            font-size: 1rem;
+            transition: border-color 0.2s;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(0, 121, 107, 0.1);
+        }
+
+        button {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.8rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-danger {
+            background-color: var(--admin-color);
+        }
+
+        .btn-danger:hover {
+            background-color: #962d22;
+        }
+
+        /* Badge de domaine sur les cartes */
+        .badge-domaine {
+            display: inline-block;
+            background-color: #e0f2f1;
+            color: var(--primary);
+            padding: 0.25rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Médias dans les cartes d'offres */
+        .offre-media-container {
+            width: 100%;
+            height: 180px;
+            background: #000;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .offre-media-container img,
+        .offre-media-container video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Boîte de Profil / Admin Vaste */
+        .profil-container,
+        .admin-container {
+            background: var(--card-bg);
+            border-radius: 10px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            padding: 2.5rem;
+            border-left: 6px solid var(--accent);
+        }
+
+        .admin-container {
+            border-left-color: var(--admin-color);
+        }
+
+        /* Onglets du Panel Admin */
+        .admin-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 1rem;
+        }
+
+        .tab-btn {
+            background: var(--light-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.2rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active-tab {
+            background-color: var(--admin-color);
+            color: white;
+            border-color: var(--admin-color);
+        }
+
+        .admin-window {
+            display: none;
+        }
+
+        .admin-window.active-window {
+            display: block;
+        }
+
+        .profil-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .profil-item {
+            background: var(--light-bg);
+            padding: 1rem;
+            border-radius: 6px;
+        }
+
+        .profil-item span {
+            display: block;
+            color: #666;
+            font-size: 0.85rem;
+            margin-bottom: 0.3rem;
+        }
+
+        .profil-item strong {
+            font-size: 1.1rem;
+            color: var(--primary);
+        }
+
+        /* Tableaux de données Admin */
+        .table-responsive {
+            overflow-x: auto;
+            margin-top: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        th,
+        td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+        }
+
+        th {
+            background-color: var(--light-bg);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        /* Grille des Offres / Demandes */
+        .grille-offres {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .carte-offre {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .carte-offre h3 {
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .carte-offre p {
+            margin-bottom: 0.5rem;
+            font-size: 0.95rem;
+        }
+
+        .error-msg {
+            color: #d32f2f;
+            margin-top: 0.8rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Section Propositions sur les Demandes */
+        .propositions-section {
+            margin-top: 1rem;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 1rem;
+        }
+
+        .liste-propositions {
+            background: var(--light-bg);
+            padding: 0.8rem;
+            border-radius: 6px;
+            margin-top: 0.5rem;
+            max-height: 150px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+        }
+
+        .proposition-item {
+            margin-bottom: 0.5rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 0.4rem;
+        }
+
+        .proposition-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        /* Modal Personnalisé Propre au Milieu */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            padding: 1rem;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            animation: modalPop 0.3s ease-in-out;
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.9);
+                opacity: 0;
+            }
+
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h3 {
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .modal-content p {
+            color: #555;
+            margin-bottom: 1.5rem;
+            font-size: 1rem;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        /* Pied de page */
+        footer {
+
+            background-color: #263238;
+            color: #b0bec5;
+            text-align: center;
+            padding: 0.25rem;
+            margin-top: auto;
+            font-size: 0.9rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+
+
+
+        /* Ajustements Responsive Mobiles */
+        @media (max-width: 768px) {
+            body {
+                zoom: 75%;
+            }
+
+            header {
+                flex-direction: column;
+                align-items: stretch;
+                text-align: center;
+                padding: 1rem;
+            }
+
+            header nav ul {
+                justify-content: center;
+                gap: 10px;
+            }
+
+            main {
+                padding: 0 1rem;
+                margin: 1rem auto;
+            }
+
+            .profil-container,
+            .admin-container {
+                padding: 1.5rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Fenêtre Modale Propre au Milieu -->
+    <div id="customModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle">Notification</h3>
+            <p id="modalMessage">Message de notification...</p>
+            <div id="modalButtons" class="modal-actions">
+                <button onclick="fermerModal()">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- En-tête / Navigation -->
+    <header>
+        <div class="logo">FeSA / TESA</div>
+        <nav>
+            <ul>
+                <li><a onclick="afficherSection('accueil')">Accueil</a></li>
+                <li><a onclick="afficherSection('offres')">Offres</a></li>
+                <li><a onclick="afficherSection('demandes')">Demandes</a></li>
+                <li><a onclick="afficherSection('connexion')" class="btn-connexion-nav" id="btnNavConnexion">Se
+                        Connecter</a></li>
+                <li id="navProfil" style="display:none;"><a onclick="afficherSection('profil')"
+                        style="font-weight:bold; color:#a7ffeb;">Mon Espace</a></li>
+                <li id="navAdmin" style="display:none;"><a onclick="afficherSection('adminDashboard')"
+                        class="btn-admin-nav" style="color:white; font-weight:bold;">Panel Admin</a></li>
+                <li id="navDeconnexion" style="display:none;"><a onclick="deconnecter()"
+                        style="color: #ffcdd2;">Déconnexion</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenu Principal -->
+    <main>
+        <!-- Section Accueil -->
+        <section id="accueil" class="section active">
+            <div style="max-width: 800px; padding: 2rem 0;">
+                <h1>Plateforme FeSA</h1>
+                <p>Bienvenue sur l'espace officiel de mise en relation d'offres, de biens, de produits et de services au
+                    Togo. Optimisez votre visibilité ou trouvez ce dont vous avez besoin rapidement.</p>
+            </div>
+        </section>
+
+        <!-- Section Connexion / Inscription Intégrée -->
+        <section id="connexion" class="section">
+            <div
+                style="max-width: 550px; margin: 2rem auto; background: white; padding: 2.5rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+
+                <!-- Bloc Connexion -->
+                <div id="blocConnexion">
+                    <h2>Connexion</h2>
+                    <p>Entrez votre code identifiant unique (ex: FESA-123456) ou votre mot de passe administrateur.</p>
+                    <form id="formConnexion">
+                        <div class="form-group">
+                            <label for="codeSaisi">Identifiant / Code d'accès :</label>
+                            <input type="password" id="codeSaisi" placeholder="Votre code ou mot de passe admin"
+                                required>
+                        </div>
+                        <button type="submit" style="width: 100%;">Se connecter</button>
+                        <div id="erreurConnexion" class="error-msg"></div>
+                    </form>
+
+                    <div
+                        style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.2rem;">
+                        <p style="margin-bottom: 0.5rem; font-size: 0.95rem;">Vous n'avez pas encore de compte ?</p>
+                        <button type="button" onclick="basculerModeFormulaire('inscription')"
+                            style="background-color: var(--primary); font-size: 0.9rem; padding: 0.6rem 1.2rem;">Créer
+                            un Compte Membre</button>
+                    </div>
+                </div>
+
+                <!-- Bloc Inscription (Intégré) -->
+                <div id="blocInscription" style="display: none;">
+                    <h2>Création de Compte Membre</h2>
+                    <p>Remplissez le formulaire ci-dessous pour obtenir votre code d'accès unique.</p>
+                    <form id="formInscription">
+                        <div class="form-group">
+                            <label for="nom">Nom & Prénoms :</label>
+                            <input type="text" id="nom" placeholder="Ex: Kodjo Mensah" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="nationalite">Nationalité :</label>
+                            <input type="text" id="nationalite" placeholder="Ex: Togolaise" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="telephone">Téléphone & WhatsApp :</label>
+                            <input type="tel" id="telephone" placeholder="Ex: +228 90000000" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quartier">Quartier / Résidence :</label>
+                            <input type="text" id="quartier" placeholder="Ex: Hedzranawoé" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="typeActeur">Type d'Acteur :</label>
+                            <select id="typeActeur">
+                                <option value="Offreur">Offreur (Je propose des biens/services)</option>
+                                <option value="Demandeur">Demandeur (Je recherche des offres)</option>
+                                <option value="Les deux">Les deux (Offreur & Demandeur)</option>
+                            </select>
+                        </div>
+                        <button type="submit" style="width: 100%; margin-top: 0.5rem;">Valider et obtenir mon
+                            code</button>
+                    </form>
+
+                    <div
+                        style="text-align: center; margin-top: 1.5rem; border-top: 1px solid var(--border-color); padding-top: 1.2rem;">
+                        <p style="margin-bottom: 0.5rem; font-size: 0.95rem;">Vous possédez déjà un compte ?</p>
+                        <button type="button" onclick="basculerModeFormulaire('connexion')"
+                            style="background-color: #7f8c8d; font-size: 0.9rem; padding: 0.6rem 1.2rem;">Se
+                            connecter</button>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section Page Personnelle / Profil -->
+        <section id="profil" class="section">
+            <div class="profil-container">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;">
+                    <h2>Mon Espace Personnel</h2>
+                    <span
+                        style="background: var(--light-bg); padding: 0.5rem 1rem; border-radius: 20px; font-weight: bold; color: var(--accent);">Code
+                        : <span id="pCode"></span></span>
+                </div>
+
+                <div class="profil-grid">
+                    <div class="profil-item">
+                        <span>Nom & Prénoms</span>
+                        <strong id="pNom">-</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Nationalité</span>
+                        <strong id="pNationalite">-</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Téléphone</span>
+                        <strong id="pTelephone">-</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Quartier</span>
+                        <strong id="pQuartier">-</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Type d'Acteur</span>
+                        <strong id="pType">-</strong>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 1.5rem; margin-top: 1.5rem;">
+                    <h3>Mes Publications (Offres & Demandes)</h3>
+                    <p>Gérez vos annonces et requêtes ci-dessous.</p>
+                    <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                        <button onclick="afficherSection('formOffreSection')">Publier une offre</button>
+                        <button onclick="afficherSection('formDemandeSection')"
+                            style="background-color: var(--primary);">Publier une demande</button>
+                    </div>
+                    <div id="mesOffresContainer" class="grille-offres"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section Formulaire de Publication d'Offre avec Domaine et Médias -->
+        <section id="formOffreSection" class="section">
+            <div
+                style="max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2>Publier une Nouvelle Offre</h2>
+                <p>Remplissez les détails de votre bien, produit ou service et ajoutez une image ou une vidéo.</p>
+                <form id="formPublierOffre">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="domaineOffre">Domaine d'activité :</label>
+                            <select id="domaineOffre" required>
+                                <option value="">-- Sélectionnez un domaine --</option>
+                                <option value="Commerce">Commerce & Vente</option>
+                                <option value="Immobilier">Immobilier (Logement, Terrain)</option>
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Elevage">Élevage</option>
+                                <option value="Services">Services & Prestations</option>
+                                <option value="Technologie">Technologie & Informatique</option>
+                                <option value="Autre">Autre domaine</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="titreOffre">Titre de l'offre :</label>
+                            <input type="text" id="titreOffre" placeholder="Ex: Appartement F3, Engrais, Volailles..."
+                                required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quartierOffre">Quartier / Localisation :</label>
+                            <input type="text" id="quartierOffre" placeholder="Ex: Hedzranawoé / Lomé" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="prixOffre">Budget / Prix (en F CFA) :</label>
+                            <input type="text" id="prixOffre" placeholder="Ex: 150 000 F CFA / mois" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="mediaOffre">Insérer une Image ou une Vidéo :</label>
+                            <input type="file" id="mediaOffre" accept="image/*,video/*">
+                            <small style="color: #666; display: block; margin-top: 0.3rem;">Formats acceptés : JPG, PNG,
+                                MP4, etc.</small>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="descriptionOffre">Description détaillée :</label>
+                            <textarea id="descriptionOffre" rows="4" placeholder="Donnez plus de détails..."
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit">Valider la publication</button>
+                        <button type="button" onclick="afficherSection('profil')"
+                            style="background-color: #7f8c8d;">Retour au profil</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Section Formulaire de Publication de Demande -->
+        <section id="formDemandeSection" class="section">
+            <div
+                style="max-width: 900px; margin: 0 auto; background: white; padding: 2.5rem; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+                <h2>Publier une Nouvelle Demande</h2>
+                <p>Exprimez votre besoin spécifique (recherche de bien, de service, de produit...).</p>
+                <form id="formPublierDemande">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="domaineDemande">Domaine d'activité :</label>
+                            <select id="domaineDemande" required>
+                                <option value="">-- Sélectionnez un domaine --</option>
+                                <option value="Commerce">Commerce & Vente</option>
+                                <option value="Immobilier">Immobilier (Logement, Terrain)</option>
+                                <option value="Agriculture">Agriculture</option>
+                                <option value="Elevage">Élevage</option>
+                                <option value="Services">Services & Prestations</option>
+                                <option value="Technologie">Technologie & Informatique</option>
+                                <option value="Autre">Autre domaine</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="titreDemande">Titre de la demande :</label>
+                            <input type="text" id="titreDemande"
+                                placeholder="Ex: Recherche urgemment maison 3 pièces..." required>
+                        </div>
+                        <div class="form-group">
+                            <label for="quartierDemande">Quartier / Localisation souhaitée :</label>
+                            <input type="text" id="quartierDemande" placeholder="Ex: Agoè / Lomé" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="budgetDemande">Budget estimé (en F CFA) :</label>
+                            <input type="text" id="budgetDemande" placeholder="Ex: 80 000 F CFA max" required>
+                        </div>
+                        <div class="form-group full-width">
+                            <label for="descriptionDemande">Description détaillée du besoin :</label>
+                            <textarea id="descriptionDemande" rows="4" placeholder="Précisez vos critères exacts..."
+                                required></textarea>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px;">
+                        <button type="submit">Valider la demande</button>
+                        <button type="button" onclick="afficherSection('profil')"
+                            style="background-color: #7f8c8d;">Retour au profil</button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Section Tableau de Bord Administrateur -->
+        <section id="adminDashboard" class="section">
+            <div class="admin-container">
+                <div
+                    style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
+                    <h2>Tableau de Bord - Administrateur Principal</h2>
+                    <button onclick="deconnecter()" class="btn-danger">Déconnexion</button>
+                </div>
+
+                <div class="profil-grid" style="margin-bottom: 2rem;">
+                    <div class="profil-item">
+                        <span>Total Abonnés</span>
+                        <strong id="statAbonnes">0</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Total Offres</span>
+                        <strong id="statOffres">0</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Total Demandes</span>
+                        <strong id="statDemandes">0</strong>
+                    </div>
+                    <div class="profil-item">
+                        <span>Total Propositions</span>
+                        <strong id="statPropositions">0</strong>
+                    </div>
+                </div>
+
+                <!-- Boutons d'onglets pour basculer entre les fenêtres Admin -->
+                <div class="admin-tabs" style="flex-wrap: wrap;">
+                    <button class="tab-btn active-tab" onclick="changerFenetreAdmin('fenetreAbonnes', this)">Fenêtre
+                        Abonnés</button>
+                    <button class="tab-btn" onclick="changerFenetreAdmin('fenetreOffres', this)">Fenêtre
+                        Offres</button>
+                    <button class="tab-btn" onclick="changerFenetreAdmin('fenetreDemandes', this)">Fenêtre
+                        Demandes</button>
+                    <button class="tab-btn" onclick="changerFenetreAdmin('fenetrePropositions', this)">Fenêtre
+                        Propositions</button>
+                </div>
+
+                <!-- Fenêtre 1 : Gestion des Abonnés -->
+                <div id="fenetreAbonnes" class="admin-window active-window">
+                    <h3>Liste des Abonnés (Membres)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Code ID</th>
+                                    <th>Nom & Prénoms</th>
+                                    <th>Nationalité</th>
+                                    <th>Téléphone</th>
+                                    <th>Quartier</th>
+                                    <th>Type d'Acteur</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableAbonnesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Fenêtre 2 : Gestion des Offres -->
+                <div id="fenetreOffres" class="admin-window">
+                    <h3>Liste des Offres</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Domaine</th>
+                                    <th>Titre</th>
+                                    <th>Auteur / Contact</th>
+                                    <th>Quartier</th>
+                                    <th>Prix</th>
+                                    <th>Média</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableOffresBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Fenêtre 3 : Gestion des Demandes -->
+                <div id="fenetreDemandes" class="admin-window">
+                    <h3>Liste des Demandes</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Domaine</th>
+                                    <th>Titre</th>
+                                    <th>Auteur / Contact</th>
+                                    <th>Quartier</th>
+                                    <th>Budget</th>
+                                    <th>Propositions</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableDemandesBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Fenêtre 4 : Gestion des Propositions -->
+                <div id="fenetrePropositions" class="admin-window">
+                    <h3>Liste des Propositions faites sur les Demandes</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Demande concernée</th>
+                                    <th>Auteur de la proposition</th>
+                                    <th>Contact</th>
+                                    <th>Proposition</th>
+                                    <th>Média</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tablePropositionsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Section Consultation Publique des Offres -->
+        <section id="offres" class="section">
+            <h2>Consultation des Offres</h2>
+            <p>Parcourez l'annuaire des biens immobiliers, produits ou services disponibles.</p>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                <div class="form-group" style="flex: 1; min-width: 250px; margin-bottom: 0;">
+                    <select id="filtreDomaineOffre" onchange="rafraichirAffichageOffresPubliques()">
+                        <option value="Tous">Tous les domaines</option>
+                        <option value="Commerce">Commerce & Vente</option>
+                        <option value="Immobilier">Immobilier</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Elevage">Élevage</option>
+                        <option value="Services">Services</option>
+                        <option value="Technologie">Technologie</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2; min-width: 250px; margin-bottom: 0;">
+                    <input type="text" id="rechercheOffre" onkeyup="rafraichirAffichageOffresPubliques()"
+                        placeholder="Rechercher par mot-clé, quartier...">
+                </div>
+            </div>
+
+            <div id="grilleOffresPublique" class="grille-offres"></div>
+        </section>
+
+        <!-- Section Consultation Publique des Demandes -->
+        <section id="demandes" class="section">
+            <h2>Consultation des Demandes</h2>
+            <p>Consultez les requêtes et besoins exprimés par les membres de la plateforme et faites vos propositions.
+            </p>
+
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 2rem;">
+                <div class="form-group" style="flex: 1; min-width: 250px; margin-bottom: 0;">
+                    <select id="filtreDomaineDemande" onchange="rafraichirAffichageDemandesPubliques()">
+                        <option value="Tous">Tous les domaines</option>
+                        <option value="Commerce">Commerce & Vente</option>
+                        <option value="Immobilier">Immobilier</option>
+                        <option value="Agriculture">Agriculture</option>
+                        <option value="Elevage">Élevage</option>
+                        <option value="Services">Services</option>
+                        <option value="Technologie">Technologie</option>
+                        <option value="Autre">Autre</option>
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2; min-width: 250px; margin-bottom: 0;">
+                    <input type="text" id="rechercheDemande" onkeyup="rafraichirAffichageDemandesPubliques()"
+                        placeholder="Rechercher dans les demandes...">
+                </div>
+            </div>
+
+            <div id="grilleDemandesPublique" class="grille-offres"></div>
+        </section>
+    </main>
+
+    <!-- Pied de page -->
+    <footer>
+        <p>&copy; 2026 - CRAEDI et CONSULTING TOGO SARLU. Tous droits réservés.</p>
+    </footer>
+
+    <!-- Script JavaScript -->
+    <script>
+
+        let listePublications = []; // Contient offres et demandes (type: 'offre' ou 'demande')
+        let utilisateurConnecte = null;
+        let adminConnecte = false;
+
+        const ADMIN_PASSWORD_SECRET = "admin123";
+
+        function initialiserDonnees() {
+
+            listePublications.push({
+                id: 1,
+                typePub: 'offre',
+                domaine: 'Immobilier',
+                titre: 'Appartement Meublé F3',
+                quartier: 'Béka / Lomé',
+                prix: '150 000 F CFA / mois',
+                description: 'Beau meublé climatisé avec toutes commodités.',
+                mediaUrl: '',
+                mediaType: '',
+                auteurCode: 'FESA-100100',
+                auteurNom: 'Kodjo Mensah',
+                auteurTel: '+22890000000',
+                propositions: []
+            });
+
+            listePublications.push({
+                id: 2,
+                typePub: 'demande',
+                domaine: 'Immobilier',
+                titre: 'Recherche Maison 3 chambres',
+                quartier: 'Agoè',
+                prix: '70 000 F CFA max',
+                description: 'Cherche maison clôturée avec garage pour famille.',
+                auteurCode: 'FESA-100100',
+                auteurNom: 'Kodjo Mensah',
+                auteurTel: '+22890000000',
+                propositions: [
+                    {
+                        auteurNom: "Yawovi Akakpo",
+                        texte: "Bonjour, j'ai une maison disponible à Agoè Logopé qui correspond à votre budget.",
+                        tel: "+22891111111"
+                    }
+                ]
+            });
+
+            rafraichirAffichageOffresPubliques();
+            rafraichirAffichageDemandesPubliques();
+        }
+
+        function afficherSection(idSection) {
+            const sections = document.querySelectorAll('.section');
+            sections.forEach(sec => sec.classList.remove('active'));
+            document.getElementById(idSection).classList.add('active');
+            window.scrollTo({top: 0, behavior: 'smooth'});
+
+            if (idSection === 'connexion') {
+                basculerModeFormulaire('connexion');
+            } else if (idSection === 'offres') {
+                rafraichirAffichageOffresPubliques();
+            } else if (idSection === 'demandes') {
+                rafraichirAffichageDemandesPubliques();
+            } else if (idSection === 'adminDashboard') {
+                chargerDonneesAdmin();
+            } else if (idSection === 'profil' && utilisateurConnecte) {
+                chargerOffresMembre();
+            }
+        }
+
+        function basculerModeFormulaire(mode) {
+            const blocConnexion = document.getElementById('blocConnexion');
+            const blocInscription = document.getElementById('blocInscription');
+
+            if (mode === 'inscription') {
+                blocConnexion.style.display = 'none';
+                blocInscription.style.display = 'block';
+            } else {
+                blocInscription.style.display = 'none';
+                blocConnexion.style.display = 'block';
+            }
+        }
+
+        function changerFenetreAdmin(idFenetre, boutonElement) {
+            const fenetres = document.querySelectorAll('.admin-window');
+            fenetres.forEach(f => f.classList.remove('active-window'));
+
+            const boutons = document.querySelectorAll('.tab-btn');
+            boutons.forEach(b => b.classList.remove('active-tab'));
+
+            document.getElementById(idFenetre).classList.add('active-window');
+            boutonElement.classList.add('active-tab');
+        }
+
+        function ouvrirModal(titre, message, actionCallback = null) {
+            document.getElementById('modalTitle').innerText = titre;
+            document.getElementById('modalMessage').innerText = message;
+
+            const btnContainer = document.getElementById('modalButtons');
+            if (actionCallback) {
+                btnContainer.innerHTML = `
+                    <button onclick="fermerModal()" style="background-color: #7f8c8d;">Annuler</button>
+                    <button id="modalConfirmBtn">Confirmer</button>
+                `;
+                document.getElementById('modalConfirmBtn').onclick = function () {
+                    fermerModal();
+                    actionCallback();
+                };
+            } else {
+                btnContainer.innerHTML = `<button onclick="fermerModal()">OK</button>`;
+            }
+
+            document.getElementById('customModal').style.display = 'flex';
+        }
+
+        function fermerModal() {
+            document.getElementById('customModal').style.display = 'none';
+        }
+
+        document.getElementById('formInscription').addEventListener('submit', function (e) {
+
+            e.preventDefault();
+
+            const codeAleatoire = 'FESA-' + Math.floor(100000 + Math.random() * 900000);
+
+            const formData = new FormData();
+
+            formData.append("code", codeAleatoire);
+            formData.append("nom", document.getElementById("nom").value);
+            formData.append("nationalite", document.getElementById("nationalite").value);
+            formData.append("telephone", document.getElementById("telephone").value);
+            formData.append("quartier", document.getElementById("quartier").value);
+            formData.append("type", document.getElementById("typeActeur").value);
+
+            fetch("php/inscription.php", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.text())
+                .then(result => {
+
+                    ouvrirModal(
+                        "Compte créé avec succès !",
+                        result + "\n\nVotre code est : " + codeAleatoire
+                    );
+
+                    document.getElementById("formInscription").reset();
+
+                })
+                .catch(error => {
+                    console.error(error);
+
+                    ouvrirModal(
+                        "Erreur",
+                        "Impossible d'enregistrer l'utilisateur dans la base de données."
+                    );
+                });
+
+        });
+
+        document.getElementById('formConnexion').addEventListener('submit', function (e) {
+
+            e.preventDefault();
+
+            const saisie = document.getElementById('codeSaisi').value.trim();
+            const erreurDiv = document.getElementById('erreurConnexion');
+
+            if (saisie === ADMIN_PASSWORD_SECRET) {
+
+                erreurDiv.innerText = '';
+
+                adminConnecte = true;
+                utilisateurConnecte = null;
+
+                document.getElementById('navAdmin').style.display = 'block';
+                document.getElementById('navProfil').style.display = 'none';
+                document.getElementById('navDeconnexion').style.display = 'block';
+                document.getElementById('btnNavConnexion').style.display = 'none';
+
+                afficherSection('adminDashboard');
+
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append("code", saisie);
+
+            fetch("php/connexion.php", {
+                method: "POST",
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+
+                    if (data.success) {
+
+                        utilisateurConnecte = data;
+
+                        chargerProfil(data);
+
+                        document.getElementById('navProfil').style.display = 'block';
+                        document.getElementById('navDeconnexion').style.display = 'block';
+                        document.getElementById('btnNavConnexion').style.display = 'none';
+
+                        document.getElementById('formConnexion').reset();
+
+                        afficherSection('profil');
+
+                    } else {
+
+                        erreurDiv.innerText = "Code utilisateur introuvable.";
+
+                    }
+
+                })
+                .catch(error => {
+
+                    console.error(error);
+
+                    erreurDiv.innerText = "Erreur de connexion au serveur.";
+
+                });
+
+        });
+
+
+        function deconnecter() {
+            utilisateurConnecte = null;
+            adminConnecte = false;
+            document.getElementById('navProfil').style.display = 'none';
+            document.getElementById('navAdmin').style.display = 'none';
+            document.getElementById('navDeconnexion').style.display = 'none';
+            document.getElementById('btnNavConnexion').style.display = 'block';
+
+            ouvrirModal("Déconnexion", "Vous avez été déconnecté avec succès.", function () {
+                afficherSection('accueil');
+            });
+        }
+
+        function chargerProfil(data) {
+            document.getElementById('pCode').innerText = data.code;
+            document.getElementById('pNom').innerText = data.nom;
+            document.getElementById('pNationalite').innerText = data.nationalite;
+            document.getElementById('pTelephone').innerText = data.telephone;
+            document.getElementById('pQuartier').innerText = data.quartier;
+            document.getElementById('pType').innerText = data.type;
+        }
+
+        // Publication d'une offre
+        document.getElementById('formPublierOffre').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (!utilisateurConnecte) {
+                ouvrirModal("Erreur", "Vous devez être connecté en tant que membre pour publier une offre.");
+                afficherSection('connexion');
+                return;
+            }
+
+            const mediaInput = document.getElementById('mediaOffre');
+            let mediaUrl = '';
+            let mediaType = '';
+
+            if (mediaInput.files && mediaInput.files[0]) {
+                const file = mediaInput.files[0];
+                mediaUrl = URL.createObjectURL(file);
+                mediaType = file.type.startsWith('video') ? 'video' : 'image';
+            }
+
+            const nouvelleOffre = {
+                id: Date.now(),
+                typePub: 'offre',
+                domaine: document.getElementById('domaineOffre').value,
+                titre: document.getElementById('titreOffre').value,
+                quartier: document.getElementById('quartierOffre').value,
+                prix: document.getElementById('prixOffre').value,
+                description: document.getElementById('descriptionOffre').value,
+                mediaUrl: mediaUrl,
+                mediaType: mediaType,
+                auteurCode: utilisateurConnecte.code,
+                auteurNom: utilisateurConnecte.nom,
+                auteurTel: utilisateurConnecte.telephone,
+                propositions: []
+            };
+
+            listePublications.push(nouvelleOffre);
+            document.getElementById('formPublierOffre').reset();
+
+            ouvrirModal("Succès", "Votre offre a été publiée avec succès !", function () {
+                afficherSection('profil');
+            });
+        });
+
+        // Publication d'une demande
+        document.getElementById('formPublierDemande').addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            if (!utilisateurConnecte) {
+                ouvrirModal("Erreur", "Vous devez être connecté en tant que membre pour publier une demande.");
+                afficherSection('connexion');
+                return;
+            }
+
+            const nouvelleDemande = {
+                id: Date.now(),
+                typePub: 'demande',
+                domaine: document.getElementById('domaineDemande').value,
+                titre: document.getElementById('titreDemande').value,
+                quartier: document.getElementById('quartierDemande').value,
+                prix: document.getElementById('budgetDemande').value,
+                description: document.getElementById('descriptionDemande').value,
+                auteurCode: utilisateurConnecte.code,
+                auteurNom: utilisateurConnecte.nom,
+                auteurTel: utilisateurConnecte.telephone,
+                propositions: []
+            };
+
+            listePublications.push(nouvelleDemande);
+            document.getElementById('formPublierDemande').reset();
+
+            ouvrirModal("Succès", "Votre demande a été publiée avec succès !", function () {
+                afficherSection('profil');
+            });
+        });
+
+        function genererHtmlMedia(offre) {
+            if (!offre.mediaUrl) {
+                return `<div class="offre-media-container" style="background:#e0f2f1; color: var(--primary); font-size: 0.85rem; font-weight: 500;">Aucun média</div>`;
+            }
+            if (offre.mediaType === 'video') {
+                return `
+                    <div class="offre-media-container">
+                        <video src="${offre.mediaUrl}" controls></video>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="offre-media-container">
+                        <img src="${offre.mediaUrl}" alt="${offre.titre}">
+                    </div>
+                `;
+            }
+        }
+
+        function chargerOffresMembre() {
+            const container = document.getElementById('mesOffresContainer');
+            const pubsMembre = listePublications.filter(o => o.auteurCode === utilisateurConnecte.code);
+
+            if (pubsMembre.length === 0) {
+                container.innerHTML = `<p style="color: #666; font-style: italic;">Vous n'avez publié aucune annonce pour le moment.</p>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            pubsMembre.forEach(pub => {
+                let badgeType = pub.typePub === 'offre' ? '<span class="badge-domaine" style="background:#e8f5e9; color:#2e7d32;">Offre</span>' : '<span class="badge-domaine" style="background:#fff3e0; color:#e65100;">Demande</span>';
+
+                container.innerHTML += `
+                    <div class="carte-offre">
+                        <div>
+                            ${pub.typePub === 'offre' ? genererHtmlMedia(pub) : ''}
+                            <div style="display:flex; gap:5px; margin-bottom:5px;">
+                                ${badgeType}
+                                <span class="badge-domaine">${pub.domaine}</span>
+                            </div>
+                            <h3>${pub.titre}</h3>
+                            <p><strong>Quartier :</strong> ${pub.quartier}</p>
+                            <p><strong>Prix / Budget :</strong> ${pub.prix}</p>
+                            <p style="font-size: 0.9rem; color:#666;">${pub.description}</p>
+                        </div>
+                        <button class="btn-danger" onclick="supprimerPublication(${pub.id})" style="margin-top: 1rem; width: 100%; padding: 0.5rem;">Supprimer</button>
+                    </div>
+                `;
+            });
+        }
+
+        function rafraichirAffichageOffresPubliques() {
+            const grille = document.getElementById('grilleOffresPublique');
+            const domaineSelectionne = document.getElementById('filtreDomaineOffre').value;
+            const motCle = document.getElementById('rechercheOffre').value.toLowerCase();
+
+            let offresFiltrees = listePublications.filter(pub => pub.typePub === 'offre').filter(offre => {
+                const matchDomaine = (domaineSelectionne === 'Tous' || offre.domaine === domaineSelectionne);
+                const matchTexte = (offre.titre.toLowerCase().includes(motCle) ||
+                    offre.quartier.toLowerCase().includes(motCle) ||
+                    offre.description.toLowerCase().includes(motCle));
+                return matchDomaine && matchTexte;
+            });
+
+            if (offresFiltrees.length === 0) {
+                grille.innerHTML = `<p>Aucune offre ne correspond à votre recherche.</p>`;
+                return;
+            }
+
+            grille.innerHTML = '';
+            offresFiltrees.forEach(offre => {
+                grille.innerHTML += `
+                    <div class="carte-offre">
+                        <div>
+                            ${genererHtmlMedia(offre)}
+                            <span class="badge-domaine">${offre.domaine}</span>
+                            <h3>${offre.titre}</h3>
+                            <p><strong>Quartier :</strong> ${offre.quartier}</p>
+                            <p><strong>Prix :</strong> ${offre.prix}</p>
+                            <p style="font-size: 0.9rem; color:#666; margin-bottom: 1rem;">${offre.description}</p>
+                        </div>
+                        <button onclick="consulterContact('${offre.auteurNom}', '${offre.auteurTel}')" style="width: 100%;">Voir les contacts (250 F)</button>
+                    </div>
+                `;
+            });
+        }
+
+        function rafraichirAffichageDemandesPubliques() {
+            const grille = document.getElementById('grilleDemandesPublique');
+            const domaineSelectionne = document.getElementById('filtreDomaineDemande').value;
+            const motCle = document.getElementById('rechercheDemande').value.toLowerCase();
+
+            let demandesFiltrees = listePublications.filter(pub => pub.typePub === 'demande').filter(demande => {
+                const matchDomaine = (domaineSelectionne === 'Tous' || demande.domaine === domaineSelectionne);
+                const matchTexte = (demande.titre.toLowerCase().includes(motCle) ||
+                    demande.quartier.toLowerCase().includes(motCle) ||
+                    demande.description.toLowerCase().includes(motCle));
+                return matchDomaine && matchTexte;
+            });
+
+            if (demandesFiltrees.length === 0) {
+                grille.innerHTML = `<p>Aucune demande ne correspond à votre recherche.</p>`;
+                return;
+            }
+
+            grille.innerHTML = '';
+            demandesFiltrees.forEach(demande => {
+                let htmlPropositions = '';
+                if (demande.propositions && demande.propositions.length > 0) {
+                    demande.propositions.forEach(prop => {
+                        htmlPropositions += `
+                            <div class="proposition-item">
+                                <strong>${prop.auteurNom} :</strong> ${prop.texte}<br>
+                                <small style="color: #00796b;">Contact : ${prop.tel}</small>
+                            </div>
+                        `;
+                    });
+                } else {
+                    htmlPropositions = `<p style="font-style:italic; color:#666; font-size:0.85rem; margin-bottom:0;">Aucune proposition pour l'instant.</p>`;
+                }
+
+                grille.innerHTML += `
+                    <div class="carte-offre" style="border-left: 4px solid #e65100;">
+                        <div>
+                            <span class="badge-domaine" style="background:#fff3e0; color:#e65100;">${demande.domaine}</span>
+                            <h3>${demande.titre}</h3>
+                            <p><strong>Quartier recherché :</strong> ${demande.quartier}</p>
+                            <p><strong>Budget :</strong> ${demande.prix}</p>
+                            <p style="font-size: 0.9rem; color:#666; margin-bottom: 0.5rem;">${demande.description}</p>
+                            <p style="font-size: 0.85rem; color:#888;">Publié par : ${demande.auteurNom}</p>
+                        </div>
+
+                        <div class="propositions-section">
+                            <strong>Propositions (${demande.propositions ? demande.propositions.length : 0})</strong>
+                            <div class="liste-propositions">
+                                ${htmlPropositions}
+                            </div>
+                            <button onclick="ouvrirModalProposition(${demande.id})" style="width: 100%; margin-top: 0.8rem; background-color: #e65100; font-size: 0.9rem; padding: 0.5rem;">Faire une proposition</button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function ouvrirModalProposition(demandeId) {
+            if (!utilisateurConnecte && !adminConnecte) {
+                ouvrirModal("Connexion requise", "Vous devez vous connecter en tant que membre pour faire une proposition à cette demande.", function () {
+                    afficherSection('connexion');
+                });
+                return;
+            }
+
+            const nomActuel = utilisateurConnecte ? utilisateurConnecte.nom : "Administrateur";
+            const telActuel = utilisateurConnecte ? utilisateurConnecte.telephone : "+228 00000000";
+
+            const modalOverlay = document.getElementById('customModal');
+            document.getElementById('modalTitle').innerText = "Faire une proposition";
+            document.getElementById('modalMessage').innerHTML = `
+        <p style="margin-bottom:0.8rem; font-size:0.9rem;">Rédigez votre solution ou proposition pour cette demande :</p>
+        <textarea id="textePropositionMembre" rows="3" placeholder="Ex: Bonjour, je propose mon service / bien..." style="width:100%; padding:0.5rem; border:1px solid #ccc; border-radius:4px; font-family:inherit; margin-bottom: 0.8rem;"></textarea>
+        
+        <label style="display:block; text-align:left; font-size:0.85rem; font-weight:600; margin-bottom:0.3rem;">Ajouter une image ou une vidéo (optionnel) :</label>
+        <input type="file" id="mediaProposition" accept="image/*,video/*" style="width:100%; font-size:0.9rem; margin-bottom:0.5rem;">
+    `;
+
+            document.getElementById('modalButtons').innerHTML = `
+        <button onclick="fermerModal()" style="background-color: #7f8c8d;">Annuler</button>
+        <button onclick="soumettreProposition(${demandeId}, '${nomActuel}', '${telActuel}')">Envoyer</button>
+    `;
+            modalOverlay.style.display = 'flex';
+        }
+
+        function soumettreProposition(demandeId, nomAuteur, telAuteur) {
+            const texteProp = document.getElementById('textePropositionMembre').value.trim();
+            const mediaInput = document.getElementById('mediaProposition');
+            let mediaUrl = '';
+            let mediaType = '';
+
+            if (!texteProp && (!mediaInput.files || !mediaInput.files[0])) {
+                alert("Veuillez saisir un texte ou insérer un média pour votre proposition.");
+                return;
+            }
+
+            if (mediaInput.files && mediaInput.files[0]) {
+                const file = mediaInput.files[0];
+                mediaUrl = URL.createObjectURL(file);
+                mediaType = file.type.startsWith('video') ? 'video' : 'image';
+            }
+
+            const demande = listePublications.find(p => p.id === demandeId);
+            if (demande) {
+                if (!demande.propositions) {
+                    demande.propositions = [];
+                }
+                demande.propositions.push({
+                    auteurNom: nomAuteur,
+                    texte: texteProp,
+                    mediaUrl: mediaUrl,
+                    mediaType: mediaType,
+                    tel: telAuteur
+                });
+            }
+
+            fermerModal();
+            rafraichirAffichageDemandesPubliques();
+            ouvrirModal("Succès", "Votre proposition avec média a été ajoutée avec succès à la demande !");
+        }
+
+        function consulterContact(nomAuteur, telAuteur) {
+            if (!utilisateurConnecte && !adminConnecte) {
+                ouvrirModal("Connexion requise", "Vous devez d'abord vous connecter ou créer un compte pour consulter les coordonnées.", function () {
+                    afficherSection('connexion');
+                });
+            } else {
+                ouvrirModal("Paiement requis (250 F CFA)", "Procédez au paiement de 250 F CFA (via T-Money ou Flooz) pour débloquer les contacts.\n\nContact de l'auteur (" + nomAuteur + ") : " + telAuteur);
+            }
+        }
+
+        // ===== PANEL ADMIN : fenêtres Offres, Demandes et Propositions séparées =====
+
+        function echapper(valeur) {   // empêche un titre ou un texte contenant du HTML de s'exécuter dans la page
+            return String(valeur ?? '').replace(/[&<>"']/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'}[c]));
+        }
+
+        function miniatureAdmin(url, type) {
+            if (!url) return '-';
+            if (type === 'video') {
+                return `<a href="${echapper(url)}" target="_blank" rel="noopener">Voir la vidéo</a>`;
+            }
+            return `<a href="${echapper(url)}" target="_blank" rel="noopener"><img src="${echapper(url)}" alt="" style="width:60px; height:45px; object-fit:cover; border-radius:4px;"></a>`;
+        }
+
+        function ligneVideAdmin(nbColonnes, texte) {
+            return `<tr><td colspan="${nbColonnes}" style="text-align:center; color:#666; font-style:italic;">${texte}</td></tr>`;
+        }
+
+        function chargerDonneesAdmin() {
+            const offres = listePublications.filter(p => p.typePub === 'offre');
+            const demandes = listePublications.filter(p => p.typePub === 'demande');
+
+            // Les propositions sont rangées dans chaque demande : on les rassemble en une seule liste
+            const propositions = [];
+            demandes.forEach(demande => {
+                (demande.propositions || []).forEach((proposition, index) => {
+                    propositions.push({demande: demande, proposition: proposition, index: index});
+                });
+            });
+
+            document.getElementById('statAbonnes').innerText = "MySQL";
+            document.getElementById('statOffres').innerText = offres.length;
+            document.getElementById('statDemandes').innerText = demandes.length;
+            document.getElementById('statPropositions').innerText = propositions.length;
+
+            // Fenêtre Offres
+            const tableOffres = document.getElementById('tableOffresBody');
+            tableOffres.innerHTML = offres.length === 0 ? ligneVideAdmin(7, 'Aucune offre publiée.') : '';
+            offres.forEach(offre => {
+                tableOffres.innerHTML += `
+                    <tr>
+                        <td><span class="badge-domaine">${echapper(offre.domaine)}</span></td>
+                        <td><strong>${echapper(offre.titre)}</strong></td>
+                        <td>${echapper(offre.auteurNom)} (${echapper(offre.auteurTel)})</td>
+                        <td>${echapper(offre.quartier)}</td>
+                        <td>${echapper(offre.prix)}</td>
+                        <td>${miniatureAdmin(offre.mediaUrl, offre.mediaType)}</td>
+                        <td><button class="btn-danger" onclick="adminSupprimerPublication(${offre.id})" style="padding:0.3rem 0.8rem; font-size:0.85rem;">Supprimer</button></td>
+                    </tr>`;
+            });
+
+            // Fenêtre Demandes
+            const tableDemandes = document.getElementById('tableDemandesBody');
+            tableDemandes.innerHTML = demandes.length === 0 ? ligneVideAdmin(7, 'Aucune demande publiée.') : '';
+            demandes.forEach(demande => {
+                tableDemandes.innerHTML += `
+                    <tr>
+                        <td><span class="badge-domaine" style="background:#fff3e0; color:#e65100;">${echapper(demande.domaine)}</span></td>
+                        <td><strong>${echapper(demande.titre)}</strong></td>
+                        <td>${echapper(demande.auteurNom)} (${echapper(demande.auteurTel)})</td>
+                        <td>${echapper(demande.quartier)}</td>
+                        <td>${echapper(demande.prix)}</td>
+                        <td>${(demande.propositions || []).length}</td>
+                        <td><button class="btn-danger" onclick="adminSupprimerPublication(${demande.id})" style="padding:0.3rem 0.8rem; font-size:0.85rem;">Supprimer</button></td>
+                    </tr>`;
+            });
+
+            // Fenêtre Propositions
+            const tablePropositions = document.getElementById('tablePropositionsBody');
+            tablePropositions.innerHTML = propositions.length === 0 ? ligneVideAdmin(6, 'Aucune proposition.') : '';
+            propositions.forEach(item => {
+                tablePropositions.innerHTML += `
+                    <tr>
+                        <td><strong>${echapper(item.demande.titre)}</strong><br><small>${echapper(item.demande.domaine)} - demandeur : ${echapper(item.demande.auteurNom)}</small></td>
+                        <td>${echapper(item.proposition.auteurNom)}</td>
+                        <td>${echapper(item.proposition.tel)}</td>
+                        <td>${echapper(item.proposition.texte) || '-'}</td>
+                        <td>${miniatureAdmin(item.proposition.mediaUrl, item.proposition.mediaType)}</td>
+                        <td><button class="btn-danger" onclick="adminSupprimerProposition(${item.demande.id}, ${item.index})" style="padding:0.3rem 0.8rem; font-size:0.85rem;">Supprimer</button></td>
+                    </tr>`;
+            });
+        }
+
+        function adminSupprimerPublication(id) {
+            const pub = listePublications.find(p => p.id === id);
+            const nbProps = pub && pub.propositions ? pub.propositions.length : 0;
+            let message = pub && pub.typePub === 'demande'
+                ? "Voulez-vous supprimer définitivement cette demande ?"
+                : "Voulez-vous supprimer définitivement cette offre ?";
+            if (nbProps > 0) {
+                message += "\n" + nbProps + " proposition(s) liée(s) seront aussi supprimée(s).";
+            }
+
+            ouvrirModal("Action Admin", message, function () {
+                listePublications = listePublications.filter(o => o.id !== id);
+                chargerDonneesAdmin();
+                rafraichirAffichageOffresPubliques();
+                rafraichirAffichageDemandesPubliques();
+            });
+        }
+
+        function adminSupprimerProposition(demandeId, index) {
+            ouvrirModal("Action Admin", "Voulez-vous supprimer définitivement cette proposition ?", function () {
+                const demande = listePublications.find(p => p.id === demandeId);
+                if (demande && demande.propositions) {
+                    demande.propositions.splice(index, 1);
+                }
+                chargerDonneesAdmin();
+                rafraichirAffichageDemandesPubliques();
+            });
+        }
+
+        function supprimerPublication(id) {
+            ouvrirModal("Confirmation", "Voulez-vous vraiment supprimer cette annonce ?", function () {
+                listePublications = listePublications.filter(o => o.id !== id);
+                chargerOffresMembre();
+                rafraichirAffichageOffresPubliques();
+                rafraichirAffichageDemandesPubliques();
+            });
+        }
+
+
+
+        function genererHtmlMediaProposition(prop) {
+            if (!prop.mediaUrl) return '';
+            if (prop.mediaType === 'video') {
+                return `
+            <div style="width: 100%; height: 120px; background: #000; border-radius: 4px; overflow: hidden; margin-top: 0.4rem; margin-bottom: 0.4rem;">
+                <video src="${prop.mediaUrl}" controls style="width: 100%; height: 100%; object-fit: cover;"></video>
+            </div>
+        `;
+            } else {
+                return `
+            <div style="width: 100%; height: 120px; background: #000; border-radius: 4px; overflow: hidden; margin-top: 0.4rem; margin-bottom: 0.4rem;">
+                <img src="${prop.mediaUrl}" alt="Proposition media" style="width: 100%; height: 100%; object-fit: cover;">
+            </div>
+        `;
+            }
+        }
+
+        window.onload = initialiserDonnees;
+    </script>
+</body>
+
+</html>
