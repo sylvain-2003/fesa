@@ -1,35 +1,15 @@
 <?php
+include 'config.php';
 
-include("config.php");
+$code        = trim($_POST['code'] ?? '');
+$domaine     = trim($_POST['domaine'] ?? '');
+$titre       = trim($_POST['titre'] ?? '');
+$quartier    = trim($_POST['quartier'] ?? '');
+$budget      = trim($_POST['budget'] ?? '');
+$description = trim($_POST['description'] ?? '');
 
-$code = $_POST['code'];
-$domaine = $_POST['domaine'];
-$titre = $_POST['titre'];
-$quartier = $_POST['quartier'];
-$budget = $_POST['budget'];
-$description = $_POST['description'];
+$stmt = mysqli_prepare($conn,
+    "INSERT INTO demandes (auteur_code, domaine, titre, quartier, budget, description) VALUES (?, ?, ?, ?, ?, ?)");
+mysqli_stmt_bind_param($stmt, "ssssss", $code, $domaine, $titre, $quartier, $budget, $description);
 
-$sql = "INSERT INTO demandes
-(
-auteur_code,
-domaine,
-titre,
-quartier,
-budget,
-description
-)
-VALUES
-(
-'$code',
-'$domaine',
-'$titre',
-'$quartier',
-'$budget',
-'$description'
-)";
-
-mysqli_query($conn,$sql);
-
-echo "success";
-
-?>
+echo mysqli_stmt_execute($stmt) ? "success" : "error";

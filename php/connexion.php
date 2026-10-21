@@ -1,6 +1,6 @@
 <?php
-header('Content-Type: application/json');
-include("config.php");
+header('Content-Type: application/json; charset=utf-8');
+include 'config.php';
 
 $code = trim($_POST['code'] ?? '');
 

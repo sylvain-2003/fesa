@@ -1099,15 +1099,21 @@
                 method: "POST",
                 body: formData
             })
-                .then(response => response.text())
+                .then(response => response.text().then(txt => {
+                    try { return JSON.parse(txt); }
+                    catch (e) { return { success: false, message: "Réponse inattendue du serveur (HTTP " + response.status + ") : " + txt.replace(/<[^>]*>/g, ' ').trim().substring(0, 200) }; }
+                }))
                 .then(result => {
 
-                    ouvrirModal(
-                        "Compte créé avec succès !",
-                        result + "\n\nVotre code est : " + codeAleatoire
-                    );
-
-                    document.getElementById("formInscription").reset();
+                    if (result.success) {
+                        ouvrirModal(
+                            "Compte créé avec succès !",
+                            result.message + "\n\nVotre code est : " + codeAleatoire
+                        );
+                        document.getElementById("formInscription").reset();
+                    } else {
+                        ouvrirModal("Erreur", result.message || "Inscription impossible.");
+                    }
 
                 })
                 .catch(error => {
@@ -1115,7 +1121,7 @@
 
                     ouvrirModal(
                         "Erreur",
-                        "Impossible d'enregistrer l'utilisateur dans la base de données."
+                        "Le serveur est injoignable (" + error.message + "). Vérifiez que le site est ouvert via http://localhost/... ou votre hébergement, pas en double-cliquant sur index.html."
                     );
                 });
 
@@ -1152,7 +1158,10 @@
                 method: "POST",
                 body: formData
             })
-                .then(response => response.json())
+                .then(response => response.text().then(txt => {
+                    try { return JSON.parse(txt); }
+                    catch (e) { return { success: false, message: "Réponse inattendue du serveur (HTTP " + response.status + ") : " + txt.replace(/<[^>]*>/g, ' ').trim().substring(0, 200) }; }
+                }))
                 .then(data => {
 
                     if (data.success) {
@@ -1171,7 +1180,7 @@
 
                     } else {
 
-                        erreurDiv.innerText = "Code utilisateur introuvable.";
+                        erreurDiv.innerText = data.message ? data.message : "Code utilisateur introuvable.";
 
                     }
 
@@ -1180,7 +1189,7 @@
 
                     console.error(error);
 
-                    erreurDiv.innerText = "Erreur de connexion au serveur.";
+                    erreurDiv.innerText = "Erreur de connexion au serveur : " + error.message;
 
                 });
 

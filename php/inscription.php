@@ -1,4 +1,5 @@
 <?php
+header('Content-Type: application/json; charset=utf-8');
 include 'config.php';
 
 $code        = trim($_POST['code'] ?? '');
@@ -9,7 +10,7 @@ $quartier    = trim($_POST['quartier'] ?? '');
 $type        = trim($_POST['type'] ?? '');
 
 if ($code === '' || $nom === '' || $telephone === '') {
-    echo "Erreur : champs obligatoires manquants";
+    echo json_encode(["success" => false, "message" => "Champs obligatoires manquants"]);
     exit;
 }
 
@@ -19,7 +20,7 @@ $stmt = mysqli_prepare($conn,
 mysqli_stmt_bind_param($stmt, "ssssss", $code, $nom, $nationalite, $telephone, $quartier, $type);
 
 if (mysqli_stmt_execute($stmt)) {
-    echo "Utilisateur enregistré";
+    echo json_encode(["success" => true, "message" => "Utilisateur enregistré"]);
 } else {
-    echo "Erreur : impossible d'enregistrer l'utilisateur";
+    echo json_encode(["success" => false, "message" => "Impossible d'enregistrer : " . mysqli_stmt_error($stmt)]);
 }
